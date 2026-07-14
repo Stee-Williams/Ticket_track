@@ -1,0 +1,24 @@
+# Configuration des services de l'application.
+# https://symfony.com/doc/current/service_container.html
+parameters:
+
+services:
+    _defaults:
+        autowire: true          # Injection automatique des dépendances
+        autoconfigure: true     # Enregistrement automatique (commandes, subscribers…)
+        bind:
+            bool $debug: '%kernel.debug%'
+
+    # Rend les classes de src/ disponibles comme services
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # Passe quelques paramètres d'environnement au service JWT
+    App\Service\JwtService:
+        arguments:
+            $secret: '%env(JWT_SECRET)%'
+            $ttl: '%env(int:JWT_TTL)%'

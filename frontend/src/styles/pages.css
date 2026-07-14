@@ -1,0 +1,419 @@
+/* ---------- En-tête de page ---------- */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+}
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* ---------- Statistiques (cartes) ---------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stat-icon.blue { background: #dbeafe; color: #2563eb; }
+.stat-icon.amber { background: #fef3c7; color: #d97706; }
+.stat-icon.green { background: #dcfce7; color: #16a34a; }
+.stat-icon.purple { background: #ede9fe; color: #7c3aed; }
+.stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+/* ---------- Grille de graphiques ---------- */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.chart-card {
+  padding: 22px;
+}
+.chart-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.chart-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+/* ---------- Filtres ---------- */
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.filters .search {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+}
+.filters .search svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+.filters .search input {
+  padding-left: 40px;
+}
+.filters select {
+  min-width: 150px;
+}
+
+/* ---------- Tableau des tickets ---------- */
+.ticket-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ticket-table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.ticket-table td {
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.ticket-table tr:last-child td {
+  border-bottom: none;
+}
+.ticket-table tbody tr {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.ticket-table tbody tr:hover {
+  background: #f8fafc;
+}
+.ref-cell {
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 13px;
+}
+.title-cell {
+  font-weight: 600;
+}
+.title-cell .cat {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ---------- Cartes de tickets (mobile) ---------- */
+.ticket-cards {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+.ticket-mini {
+  padding: 16px;
+  cursor: pointer;
+}
+.ticket-mini-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ticket-mini-title {
+  font-weight: 600;
+  margin: 8px 0;
+}
+.ticket-mini-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* ---------- Détail ticket ---------- */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+.detail-main {
+  padding: 26px;
+}
+.detail-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 12px 0 6px;
+}
+.detail-desc {
+  color: var(--text);
+  line-height: 1.7;
+  margin: 18px 0;
+  white-space: pre-wrap;
+}
+.detail-side {
+  padding: 22px;
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.detail-row:last-child {
+  border-bottom: none;
+}
+.detail-row .label {
+  color: var(--text-muted);
+}
+.section-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin: 24px 0 12px;
+}
+
+/* ---------- Commentaires ---------- */
+.comment {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.comment:last-of-type {
+  border-bottom: none;
+}
+.comment-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.comment-body {
+  flex: 1;
+}
+.comment-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.comment-author {
+  font-weight: 600;
+  font-size: 14px;
+}
+.comment-time {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.comment-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ---------- Techniciens ---------- */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.tech-card {
+  padding: 22px;
+  text-align: center;
+}
+.tech-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  font-weight: 700;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+.tech-name {
+  font-weight: 700;
+  font-size: 16px;
+}
+.tech-email {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 3px;
+}
+.tech-load {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+.tech-load strong {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.link-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.link-back:hover {
+  color: var(--primary);
+}
+
+/* ---------- Formulaire de page ---------- */
+.form-page {
+  max-width: 680px;
+}
+.form-card {
+  padding: 28px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ---------- Pagination ---------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.pagination-info {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pagination-page {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ---------- Historique (timeline) ---------- */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.timeline-item {
+  position: relative;
+  padding: 0 0 16px 22px;
+  border-left: 2px solid var(--border);
+}
+.timeline-item:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.timeline-item.is-status::before { background: var(--primary); }
+.timeline-item.is-assigned::before { background: #f59e0b; }
+.timeline-item.is-created::before { background: #22c55e; }
+.timeline-item.is-commented::before { background: var(--text-muted); }
+.timeline-details {
+  font-size: 14px;
+  font-weight: 600;
+}
+.timeline-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .charts-grid,
+  .detail-grid,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .ticket-table-wrapper {
+    display: none;
+  }
+  .ticket-cards {
+    display: flex;
+  }
+}
