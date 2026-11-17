@@ -38,12 +38,13 @@ export default function Login() {
           <h2>Bon retour !</h2>
           <p className="subtitle">Connectez-vous pour accéder à vos tickets.</p>
 
-          {error && <div className="alert alert-error">{error}</div>}
+          {error && <div className="alert alert-error" role="alert">{error}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Adresse e-mail</label>
+              <label htmlFor="login-email">Adresse e-mail</label>
               <input
+                id="login-email"
                 type="email"
                 className="form-control"
                 value={email}
@@ -53,8 +54,9 @@ export default function Login() {
               />
             </div>
             <div className="form-group">
-              <label>Mot de passe</label>
+              <label htmlFor="login-password">Mot de passe</label>
               <input
+                id="login-password"
                 type="password"
                 className="form-control"
                 value={password}

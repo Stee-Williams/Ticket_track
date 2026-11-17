@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: TicketHistoryRepository::class)]
 #[ORM\Table(name: 'ticket_history')]
-#[ORM\Index(name: 'idx_history_ticket', columns: ['ticket_id'])]
+#[ORM\Index(name: 'idx_history_ticket_created', columns: ['ticket_id', 'created_at', 'id'])]
 class TicketHistory
 {
     public const ACTION_CREATED   = 'created';

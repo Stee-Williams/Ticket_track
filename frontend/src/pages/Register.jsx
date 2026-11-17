@@ -40,12 +40,13 @@ export default function Register() {
           <h2>Créer un compte</h2>
           <p className="subtitle">Inscrivez-vous pour signaler et suivre vos pannes.</p>
 
-          {error && <div className="alert alert-error">{error}</div>}
+          {error && <div className="alert alert-error" role="alert">{error}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Nom complet</label>
+              <label htmlFor="register-name">Nom complet</label>
               <input
+                id="register-name"
                 type="text"
                 className="form-control"
                 value={form.name}
@@ -56,8 +57,9 @@ export default function Register() {
               {errors.name && <div className="field-error">{errors.name}</div>}
             </div>
             <div className="form-group">
-              <label>Adresse e-mail</label>
+              <label htmlFor="register-email">Adresse e-mail</label>
               <input
+                id="register-email"
                 type="email"
                 className="form-control"
                 value={form.email}
@@ -68,8 +70,9 @@ export default function Register() {
               {errors.email && <div className="field-error">{errors.email}</div>}
             </div>
             <div className="form-group">
-              <label>Téléphone (optionnel)</label>
+              <label htmlFor="register-phone">Téléphone (optionnel)</label>
               <input
+                id="register-phone"
                 type="tel"
                 className="form-control"
                 value={form.phone}
@@ -78,8 +81,9 @@ export default function Register() {
               />
             </div>
             <div className="form-group">
-              <label>Mot de passe</label>
+              <label htmlFor="register-password">Mot de passe</label>
               <input
+                id="register-password"
                 type="password"
                 className="form-control"
                 value={form.password}

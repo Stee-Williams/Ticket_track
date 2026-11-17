@@ -21,13 +21,13 @@ class TicketRepository extends ServiceEntityRepository
     /**
      * Liste paginée des tickets filtrée selon le rôle et les critères.
      *
-     * @return array{items: Ticket[], total: int}
+     * @return array{items: list<array<string, mixed>>, total: int}
      */
     public function paginateForUser(User $user, array $filters, int $page, int $limit): array
     {
         $offset = ($page - 1) * $limit;
 
-        $items = $this->filteredQuery($user, $filters)
+        $items = $this->filteredListQuery($user, $filters)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()
@@ -37,13 +37,16 @@ class TicketRepository extends ServiceEntityRepository
     }
 
     /**
-     * Toutes les lignes filtrées (sans pagination) — utilisé pour l'export.
+     * Charge au plus le nombre demandé de tickets pour borner les exports.
      *
      * @return Ticket[]
      */
-    public function findAllForUser(User $user, array $filters): array
+    public function findForExport(User $user, array $filters, int $limit): array
     {
-        return $this->filteredQuery($user, $filters)->getQuery()->getResult();
+        return $this->filteredQuery($user, $filters)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     public function countForUser(User $user, array $filters): int
@@ -68,6 +71,40 @@ class TicketRepository extends ServiceEntityRepository
         $this->applyScope($qb, $user);
         $this->applyFilters($qb, $filters);
 
+        $this->applyOrdering($qb);
+
+        return $qb;
+    }
+
+    /**
+     * Select only the fields displayed in the paginated ticket list.
+     */
+    private function filteredListQuery(User $user, array $filters): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select(
+                't.id AS id',
+                't.reference AS reference',
+                't.title AS title',
+                't.category AS category',
+                't.priority AS priority',
+                't.status AS status',
+                'creator.name AS creator_name',
+                'tech.name AS technician_name',
+                't.createdAt AS created_at'
+            )
+            ->join('t.createdBy', 'creator')
+            ->leftJoin('t.assignedTo', 'tech');
+
+        $this->applyScope($qb, $user);
+        $this->applyFilters($qb, $filters);
+        $this->applyOrdering($qb);
+
+        return $qb;
+    }
+
+    private function applyOrdering(QueryBuilder $qb): void
+    {
         // Tri : statut (attente d'abord), puis priorité (urgente d'abord), puis date
         $qb->addSelect(
             "CASE t.status WHEN 'en_attente' THEN 0 WHEN 'en_cours' THEN 1 ELSE 2 END AS HIDDEN status_order"
@@ -78,8 +115,6 @@ class TicketRepository extends ServiceEntityRepository
         $qb->orderBy('status_order', 'ASC')
            ->addOrderBy('prio_order', 'ASC')
            ->addOrderBy('t.createdAt', 'DESC');
-
-        return $qb;
     }
 
     private function applyFilters(QueryBuilder $qb, array $filters): void
@@ -101,18 +136,7 @@ class TicketRepository extends ServiceEntityRepository
 
     public function generateReference(): string
     {
-        $count = (int) $this->createQueryBuilder('t')
-            ->select('COUNT(t.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        do {
-            $count++;
-            $reference = 'TCK-' . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
-            $exists = $this->findOneBy(['reference' => $reference]);
-        } while ($exists !== null);
-
-        return $reference;
+        return 'TCK-' . strtoupper(bin2hex(random_bytes(8)));
     }
 
     /**

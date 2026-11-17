@@ -22,7 +22,11 @@ Configurez la connexion dans `.env` (ou mieux `.env.local`) :
 ```
 DATABASE_URL="postgresql://postgres:VOTRE_MDP@127.0.0.1:5432/ticket_track?serverVersion=18&charset=utf8"
 JWT_SECRET=une_cle_secrete_aleatoire
+CORS_ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
 ```
+
+`CORS_ALLOWED_ORIGINS` contient les origines exactes du frontend, séparées par des
+virgules. En production, renseignez les domaines déployés dans `.env.local`.
 
 Créez le schéma puis les données de démonstration :
 
@@ -80,6 +84,7 @@ Identiques à ceux attendus par le frontend React :
 | POST    | `/api/auth/login`            | Connexion (retourne un JWT)       |
 | GET     | `/api/auth/me`               | Profil courant                    |
 | GET     | `/api/tickets`               | Liste filtrée selon le rôle       |
+| GET     | `/api/tickets/export`        | Export PDF/Excel (5 000 tickets max.) |
 | POST    | `/api/tickets`               | Créer un ticket                   |
 | GET     | `/api/tickets/{id}`          | Détail + commentaires             |
 | PUT     | `/api/tickets/{id}/assign`   | Attribuer un technicien (manager) |

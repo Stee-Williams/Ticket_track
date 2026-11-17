@@ -8,6 +8,24 @@ const client = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+const pendingGetRequests = new Map();
+
+export function getShared(url, config = {}) {
+  const params = Object.entries(config.params || {}).sort(([a], [b]) => a.localeCompare(b));
+  const token = localStorage.getItem('tt_token');
+  const key = JSON.stringify([url, params, config.responseType || 'json', token]);
+  const pendingRequest = pendingGetRequests.get(key);
+  if (pendingRequest) return pendingRequest;
+
+  const request = client.get(url, config).finally(() => {
+    if (pendingGetRequests.get(key) === request) {
+      pendingGetRequests.delete(key);
+    }
+  });
+  pendingGetRequests.set(key, request);
+  return request;
+}
+
 // Injecte automatiquement le jeton JWT dans chaque requête
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('tt_token');

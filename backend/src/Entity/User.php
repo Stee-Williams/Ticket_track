@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
+#[ORM\Index(name: 'idx_users_role_name', columns: ['role', 'name'])]
 class User
 {
     public const ROLE_USER       = 'user';

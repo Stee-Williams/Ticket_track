@@ -8,6 +8,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 #[ORM\Table(name: 'tickets')]
+#[ORM\Index(name: 'idx_tickets_creator_status_created', columns: ['created_by', 'status', 'created_at'])]
+#[ORM\Index(name: 'idx_tickets_assignee_status_created', columns: ['assigned_to', 'status', 'created_at'])]
+#[ORM\Index(name: 'idx_tickets_status_priority', columns: ['status', 'priority'])]
+#[ORM\Index(name: 'idx_tickets_category', columns: ['category'])]
+#[ORM\Index(name: 'idx_tickets_created_at', columns: ['created_at'])]
+#[ORM\Index(name: 'idx_tickets_status_resolved_at', columns: ['status', 'resolved_at'])]
 #[ORM\HasLifecycleCallbacks]
 class Ticket
 {

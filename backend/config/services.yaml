@@ -22,3 +22,7 @@ services:
         arguments:
             $secret: '%env(JWT_SECRET)%'
             $ttl: '%env(int:JWT_TTL)%'
+
+    App\EventSubscriber\CorsSubscriber:
+        arguments:
+            $allowedOrigins: '%env(csv:CORS_ALLOWED_ORIGINS)%'

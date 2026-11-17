@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import client from '../api/client';
-import { Spinner, EmptyState } from '../components/UI';
+import { PageSkeleton, EmptyState } from '../components/UI';
 import { initials } from '../utils/labels';
 import '../styles/pages.css';
 
@@ -19,13 +19,14 @@ export default function Technicians() {
     <div>
       <div className="page-header">
         <div>
-          <div className="page-title">Techniciens</div>
+          <div className="page-eyebrow"><span className="page-eyebrow-dot" /> ÉQUIPE SUPPORT</div>
+          <h1 className="page-title">Techniciens</h1>
           <div className="page-subtitle">Équipe de maintenance et charge de travail actuelle</div>
         </div>
       </div>
 
       {loading ? (
-        <Spinner />
+        <PageSkeleton variant="technicians" />
       ) : technicians.length === 0 ? (
         <div className="card">
           <EmptyState title="Aucun technicien" message="Aucun technicien n'est enregistré pour le moment." />

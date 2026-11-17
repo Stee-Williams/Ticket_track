@@ -46,7 +46,8 @@ export default function NewTicket() {
 
       <div className="page-header">
         <div>
-          <div className="page-title">Signaler une panne</div>
+          <div className="page-eyebrow"><span className="page-eyebrow-dot" /> NOUVELLE DEMANDE</div>
+          <h1 className="page-title">Signaler une panne</h1>
           <div className="page-subtitle">
             Décrivez le problème rencontré, un technicien sera assigné rapidement.
           </div>
@@ -54,12 +55,13 @@ export default function NewTicket() {
       </div>
 
       <div className="card form-card">
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && <div className="alert alert-error" role="alert">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Titre du problème *</label>
+            <label htmlFor="ticket-title">Titre du problème *</label>
             <input
+              id="ticket-title"
               type="text"
               className="form-control"
               value={form.title}
@@ -72,16 +74,16 @@ export default function NewTicket() {
 
           <div className="form-row">
             <div className="form-group">
-              <label>Catégorie</label>
-              <select className="form-control" value={form.category} onChange={update('category')}>
+              <label htmlFor="ticket-category">Catégorie</label>
+              <select id="ticket-category" className="form-control" value={form.category} onChange={update('category')}>
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>
             <div className="form-group">
-              <label>Priorité</label>
-              <select className="form-control" value={form.priority} onChange={update('priority')}>
+              <label htmlFor="ticket-priority">Priorité</label>
+              <select id="ticket-priority" className="form-control" value={form.priority} onChange={update('priority')}>
                 <option value="basse">Basse</option>
                 <option value="normale">Normale</option>
                 <option value="haute">Haute</option>
@@ -91,8 +93,9 @@ export default function NewTicket() {
           </div>
 
           <div className="form-group">
-            <label>Description détaillée *</label>
+            <label htmlFor="ticket-description">Description détaillée *</label>
             <textarea
+              id="ticket-description"
               className="form-control"
               value={form.description}
               onChange={update('description')}

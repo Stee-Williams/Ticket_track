@@ -5,12 +5,12 @@ import {PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart,
 } from 'recharts';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import { Spinner } from '../components/UI';
+import { PageSkeleton } from '../components/UI';
 import { PRIORITY_LABELS } from '../utils/labels';
 import '../styles/pages.css';
 
-const STATUS_COLORS = { en_attente: '#f59e0b', en_cours: '#3b82f6', traite: '#22c55e' };
-const PRIORITY_COLORS = { basse: '#94a3b8', normale: '#3b82f6', haute: '#f97316', urgente: '#ef4444' };
+const STATUS_COLORS = { en_attente: '#e6ad58', en_cours: '#71b8c5', traite: '#79b98c' };
+const PRIORITY_COLORS = { basse: '#a59b90', normale: '#71b8c5', haute: '#e6ad58', urgente: '#e17c65' };
 
 function StatCard({ icon, color, value, label }) {
   return (
@@ -36,7 +36,7 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Spinner />;
+  if (loading) return <PageSkeleton variant="dashboard" />;
   if (!stats) return <div className="alert alert-error">Impossible de charger les statistiques.</div>;
 
   const statusData = [
@@ -60,7 +60,8 @@ export default function Dashboard() {
     <div>
       <div className="page-header">
         <div>
-          <div className="page-title">Bonjour, {user.name.split(' ')[0]} </div>
+          <div className="page-eyebrow"><span className="page-eyebrow-dot" /> VUE D’ENSEMBLE</div>
+          <h1 className="page-title">Bonjour, <span>{user.name.split(' ')[0]}</span></h1>
           <div className="page-subtitle">Voici un aperçu de l'activité des tickets de pannes.</div>
         </div>
         {(user.role === 'user' || user.role === 'manager') && (
@@ -73,7 +74,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="stats-grid">
+      <section className="stats-grid" aria-label="Indicateurs des tickets">
         <StatCard
           color="purple"
           value={stats.total}
@@ -98,9 +99,9 @@ export default function Dashboard() {
           label="Taux de résolution"
           icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><path d="M22 4L12 14.01l-3-3" strokeLinecap="round" strokeLinejoin="round" /></svg>}
         />
-      </div>
+      </section>
 
-      <div className="charts-grid">
+      <section className="charts-grid" aria-label="Analyse des tickets">
         <div className="card chart-card">
           <div className="chart-title">Tickets créés (7 derniers jours)</div>
           <div className="chart-sub">Évolution des demandes de dépannage</div>
@@ -108,15 +109,15 @@ export default function Dashboard() {
             <AreaChart data={trendData}>
               <defs>
                 <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#d99a57" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#d99a57" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" vertical={false} />
-              <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#342d26" vertical={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#a59b90' }} axisLine={false} tickLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#a59b90' }} axisLine={false} tickLine={false} />
               <Tooltip />
-              <Area type="monotone" dataKey="total" stroke="#4f46e5" strokeWidth={2.5} fill="url(#colorTrend)" name="Tickets" />
+              <Area type="monotone" dataKey="total" stroke="#d99a57" strokeWidth={2.5} fill="url(#colorTrend)" name="Tickets" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -140,18 +141,18 @@ export default function Dashboard() {
             </ResponsiveContainer>
           )}
         </div>
-      </div>
+      </section>
 
-      <div className="charts-grid">
+      <section className="charts-grid">
         <div className="card chart-card">
           <div className="chart-title">Répartition par priorité</div>
           <div className="chart-sub">Niveau d'urgence des tickets</div>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={priorityData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <Tooltip cursor={{ fill: '#f8fafc' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#342d26" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#a59b90' }} axisLine={false} tickLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#a59b90' }} axisLine={false} tickLine={false} />
+              <Tooltip cursor={{ fill: 'rgba(217, 154, 87, 0.08)' }} />
               <Bar dataKey="value" name="Tickets" radius={[6, 6, 0, 0]}>
                 {priorityData.map((entry) => (
                   <Cell key={entry.key} fill={PRIORITY_COLORS[entry.key]} />
@@ -192,7 +193,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

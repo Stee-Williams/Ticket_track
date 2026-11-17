@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link, useOutletContext } from 'react-router-dom';
-import client, { getErrorMessage } from '../api/client';
+import client, { getErrorMessage, getShared } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { StatusBadge, PriorityBadge } from '../components/Badges';
-import { Spinner } from '../components/UI';
+import { PageSkeleton } from '../components/UI';
 import { formatDate, initials, ROLE_LABELS } from '../utils/labels';
 import '../styles/pages.css';
 
@@ -31,7 +31,7 @@ export default function TicketDetail() {
 
   const load = useCallback(async () => {
     try {
-      const { data } = await client.get(`/tickets/${id}`);
+      const { data } = await getShared(`/tickets/${id}`);
       setTicket(data.data.ticket);
       setComments(data.data.comments);
       setHistory(data.data.history || []);
@@ -49,7 +49,7 @@ export default function TicketDetail() {
   // Le gestionnaire charge la liste des techniciens pour l'attribution
   useEffect(() => {
     if (user.role === 'manager') {
-      client.get('/users/technicians').then(({ data }) => setTechnicians(data.data.technicians)).catch(() => {});
+      getShared('/users/technicians').then(({ data }) => setTechnicians(data.data.technicians)).catch(() => {});
     }
   }, [user.role]);
 
@@ -72,11 +72,14 @@ export default function TicketDetail() {
   };
 
   const handleStatus = async (status) => {
+    const previousTicket = ticket;
+    setTicket((current) => ({ ...current, status }));
     setBusy(true);
     try {
       await client.put(`/tickets/${id}/status`, { status });
       await refresh();
     } catch (err) {
+      setTicket(previousTicket);
       setError(getErrorMessage(err));
     } finally {
       setBusy(false);
@@ -108,7 +111,7 @@ export default function TicketDetail() {
     }
   };
 
-  if (loading) return <Spinner />;
+  if (loading) return <PageSkeleton variant="detail" />;
   if (error && !ticket) return <div className="alert alert-error">{error}</div>;
   if (!ticket) return null;
 
@@ -134,6 +137,9 @@ export default function TicketDetail() {
             <span className="ref-cell">{ticket.reference}</span>
             <PriorityBadge priority={ticket.priority} />
             <StatusBadge status={ticket.status} />
+          </div>
+          <div className="page-eyebrow ticket-detail-eyebrow">
+            <span className="page-eyebrow-dot" /> SUIVI DE LA DEMANDE
           </div>
           <h1 className="detail-title">{ticket.title}</h1>
           <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>

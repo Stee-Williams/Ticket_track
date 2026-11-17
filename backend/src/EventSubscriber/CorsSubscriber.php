@@ -17,6 +17,10 @@ class CorsSubscriber implements EventSubscriberInterface
     private const ALLOW_METHODS = 'GET, POST, PUT, DELETE, OPTIONS';
     private const ALLOW_HEADERS = 'Content-Type, Authorization';
 
+    public function __construct(private readonly array $allowedOrigins)
+    {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -46,20 +50,17 @@ class CorsSubscriber implements EventSubscriberInterface
 
     private function headers(?string $origin): array
     {
-        $allowOrigin = $this->isAllowed($origin) ? $origin : 'http://localhost:5173';
-
-        return [
-            'Access-Control-Allow-Origin'      => $allowOrigin,
+        $headers = [
             'Access-Control-Allow-Methods'     => self::ALLOW_METHODS,
             'Access-Control-Allow-Headers'     => self::ALLOW_HEADERS,
-            'Access-Control-Allow-Credentials' => 'true',
             'Vary'                             => 'Origin',
         ];
-    }
 
-    private function isAllowed(?string $origin): bool
-    {
-        return $origin !== null
-            && preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?$#', $origin) === 1;
+        if ($origin !== null && in_array($origin, $this->allowedOrigins, true)) {
+            $headers['Access-Control-Allow-Origin'] = $origin;
+            $headers['Access-Control-Allow-Credentials'] = 'true';
+        }
+
+        return $headers;
     }
 }

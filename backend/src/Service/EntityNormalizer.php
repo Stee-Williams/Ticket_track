@@ -52,6 +52,28 @@ class EntityNormalizer
         ];
     }
 
+    public function ticketList(array $row): array
+    {
+        $createdAt = $row['created_at'];
+        if (!$createdAt instanceof \DateTimeInterface && !is_string($createdAt)) {
+            throw new \UnexpectedValueException('Date de création de ticket invalide.');
+        }
+
+        return [
+            'id'              => (int) $row['id'],
+            'reference'       => $row['reference'],
+            'title'           => $row['title'],
+            'category'        => $row['category'],
+            'priority'        => $row['priority'],
+            'status'          => $row['status'],
+            'creator_name'    => $row['creator_name'],
+            'technician_name' => $row['technician_name'],
+            'created_at'      => $createdAt instanceof \DateTimeInterface
+                ? $createdAt->format(self::DATE_FORMAT)
+                : $createdAt,
+        ];
+    }
+
     public function comment(TicketComment $c): array
     {
         return [

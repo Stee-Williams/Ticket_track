@@ -26,6 +26,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/tickets')]
 class TicketController
 {
+    private const MAX_EXPORT_TICKETS = 5000;
+
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly TicketRepository $tickets,
@@ -52,7 +54,7 @@ class TicketController
         $limit = max(1, min($limit, 100));
 
         $result = $this->tickets->paginateForUser($user, $filters, $page, $limit);
-        $data   = array_map(fn (Ticket $t) => $this->normalizer->ticket($t), $result['items']);
+        $data   = array_map(fn (array $row) => $this->normalizer->ticketList($row), $result['items']);
 
         $total = $result['total'];
         $pages = (int) max(1, ceil($total / $limit));
@@ -75,7 +77,13 @@ class TicketController
         $filters = $this->filtersFrom($request);
         $format  = strtolower((string) $request->query->get('format', 'xlsx'));
 
-        $tickets = $this->tickets->findAllForUser($user, $filters);
+        $tickets = $this->tickets->findForExport($user, $filters, self::MAX_EXPORT_TICKETS + 1);
+        if (count($tickets) > self::MAX_EXPORT_TICKETS) {
+            throw new ApiException(
+                'L’export est limité à 5 000 tickets. Ajoutez un filtre pour réduire le résultat.',
+                422
+            );
+        }
 
         return match ($format) {
             'pdf'          => $this->export->toPdf($tickets),
@@ -118,16 +126,14 @@ class TicketController
             ->setStatus(Ticket::STATUS_WAITING)
             ->setCreatedBy($user);
 
-        $this->em->persist($ticket);
-        $this->em->flush();
-
-        $this->history->logCreated($ticket, $user);
-
-        $this->notifier->notifyManagers(
-            $ticket,
-            "Nouveau ticket {$ticket->getReference()} : {$ticket->getTitle()}"
-        );
-        $this->em->flush();
+        $this->em->wrapInTransaction(function () use ($ticket, $user): void {
+            $this->em->persist($ticket);
+            $this->history->logCreated($ticket, $user);
+            $this->notifier->notifyManagers(
+                $ticket,
+                "Nouveau ticket {$ticket->getReference()} : {$ticket->getTitle()}"
+            );
+        });
 
         return ApiResponse::success(['ticket' => $this->normalizer->ticket($ticket)], 'Ticket créé avec succès.', 201);
     }

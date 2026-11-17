@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TicketCommentRepository::class)]
 #[ORM\Table(name: 'ticket_comments')]
+#[ORM\Index(name: 'idx_comments_ticket_created', columns: ['ticket_id', 'created_at'])]
 class TicketComment
 {
     #[ORM\Id]

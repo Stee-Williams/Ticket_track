@@ -1,20 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import client from '../api/client';
+import { Link } from 'react-router-dom';
+import client, { getErrorMessage, getShared } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { StatusBadge, PriorityBadge } from '../components/Badges';
-import { Spinner, EmptyState } from '../components/UI';
+import { PageSkeleton, EmptyState } from '../components/UI';
 import { formatDate } from '../utils/labels';
 import '../styles/pages.css';
 
 const PAGE_SIZE = 10;
 
 export default function Tickets() {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState('');
+  const [exportError, setExportError] = useState('');
   const [filters, setFilters] = useState({ search: '', status: '', priority: '' });
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0, limit: PAGE_SIZE });
@@ -31,7 +31,7 @@ export default function Tickets() {
     setLoading(true);
     try {
       const params = { ...buildParams(), page, limit: PAGE_SIZE };
-      const { data } = await client.get('/tickets', { params });
+      const { data } = await getShared('/tickets', { params });
       setTickets(data.data.tickets);
       if (data.data.pagination) setPagination(data.data.pagination);
     } finally {
@@ -52,6 +52,7 @@ export default function Tickets() {
   };
 
   const handleExport = async (format) => {
+    setExportError('');
     setExporting(format);
     try {
       const params = { ...buildParams(), format };
@@ -64,6 +65,19 @@ export default function Tickets() {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
+    } catch (err) {
+      let message = getErrorMessage(err, 'Impossible de générer l’export.');
+      const responseData = err?.response?.data;
+      if (responseData instanceof Blob) {
+        const text = await responseData.text();
+        try {
+          const payload = JSON.parse(text);
+          if (typeof payload.message === 'string') message = payload.message;
+        } catch {
+          // Conserve le message générique si la réponse n'est pas une erreur JSON de l'API.
+        }
+      }
+      setExportError(message);
     } finally {
       setExporting('');
     }
@@ -76,7 +90,8 @@ export default function Tickets() {
     <div>
       <div className="page-header">
         <div>
-          <div className="page-title">Tickets</div>
+          <div className="page-eyebrow"><span className="page-eyebrow-dot" /> CENTRE DE SUPPORT</div>
+          <h1 className="page-title">Tickets</h1>
           <div className="page-subtitle">
             {user.role === 'user' && 'Vos demandes de dépannage'}
             {user.role === 'technician' && 'Tickets qui vous sont attribués'}
@@ -111,21 +126,27 @@ export default function Tickets() {
         </div>
       </div>
 
-      <div className="filters">
+      {exportError && <div className="alert alert-error" role="alert">{exportError}</div>}
+
+      <div className="filters-panel card">
         <div className="search">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" strokeLinecap="round" />
           </svg>
           <input
+            id="ticket-search"
             className="form-control"
+            aria-label="Rechercher un ticket"
             placeholder="Rechercher (titre, référence…)"
             value={filters.search}
             onChange={(e) => updateFilter('search', e.target.value)}
           />
         </div>
         <select
+          id="ticket-status"
           className="form-control"
+          aria-label="Filtrer par statut"
           value={filters.status}
           onChange={(e) => updateFilter('status', e.target.value)}
         >
@@ -135,7 +156,9 @@ export default function Tickets() {
           <option value="traite">Traité</option>
         </select>
         <select
+          id="ticket-priority"
           className="form-control"
+          aria-label="Filtrer par priorité"
           value={filters.priority}
           onChange={(e) => updateFilter('priority', e.target.value)}
         >
@@ -148,7 +171,7 @@ export default function Tickets() {
       </div>
 
       {loading ? (
-        <Spinner />
+        <PageSkeleton variant="tickets" />
       ) : !hasTickets ? (
         <div className="card">
           <EmptyState
@@ -170,21 +193,21 @@ export default function Tickets() {
             <table className="ticket-table">
               <thead>
                 <tr>
-                  <th>Réf.</th>
-                  <th>Titre</th>
-                  <th>Priorité</th>
-                  <th>Statut</th>
-                  {user.role !== 'user' && <th>Demandeur</th>}
-                  <th>Technicien</th>
-                  <th>Créé le</th>
+                  <th scope="col">Réf.</th>
+                  <th scope="col">Titre</th>
+                  <th scope="col">Priorité</th>
+                  <th scope="col">Statut</th>
+                  {user.role !== 'user' && <th scope="col">Demandeur</th>}
+                  <th scope="col">Technicien</th>
+                  <th scope="col">Créé le</th>
                 </tr>
               </thead>
               <tbody>
                 {tickets.map((t) => (
-                  <tr key={t.id} onClick={() => navigate(`/tickets/${t.id}`)}>
+                  <tr key={t.id}>
                     <td className="ref-cell">{t.reference}</td>
                     <td className="title-cell">
-                      {t.title}
+                      <Link className="ticket-row-link" to={`/tickets/${t.id}`}>{t.title}</Link>
                       <div className="cat">{t.category}</div>
                     </td>
                     <td><PriorityBadge priority={t.priority} /></td>
@@ -201,7 +224,7 @@ export default function Tickets() {
           {/* Vue cartes (mobile) */}
           <div className="ticket-cards">
             {tickets.map((t) => (
-              <div key={t.id} className="card ticket-mini" onClick={() => navigate(`/tickets/${t.id}`)}>
+              <Link key={t.id} to={`/tickets/${t.id}`} className="card ticket-mini">
                 <div className="ticket-mini-head">
                   <span className="ref-cell">{t.reference}</span>
                   <StatusBadge status={t.status} />
@@ -211,7 +234,7 @@ export default function Tickets() {
                   <PriorityBadge priority={t.priority} />
                   <span className="badge badge-basse">{t.category}</span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
